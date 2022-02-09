@@ -1,0 +1,191 @@
+const requestQuery =<%-JSON.stringify(reqQuery) %>;
+const existingDirs =<%-JSON.stringify(dirs.reduce((arr, itmDir) => { arr.push(itmDir.name); return arr }, [])) %>;
+const requestOrigin = window.opener || window.parent;
+const ckEditorCallback = requestQuery.CKEditorFuncNum;
+const ckEditorElement = requestQuery.CKEditor;
+const callBackFn = requestQuery.onSelect;
+const targetElement = requestQuery.tElement;
+const isStandAlone = requestOrigin == self;
+function reqQueryVars(retType = "S") {
+    const rqArr = [];
+    Object.keys(requestQuery).forEach(item => {
+        rqArr.push(item + "=" + requestQuery[item]);
+    });
+    if (retType.toUpperCase() == "S") {
+        return rqArr.length > 0 ? "?" + rqArr.join("&") : "";
+    } else {
+        return rqArr;
+    }
+}
+function upDir() {
+    let curPath = document.location.pathname;
+    if (curPath == "/") return;
+    curPath = curPath.split("/").filter(item => item != "");
+    curPath.pop();
+    document.location = "/" + curPath.join("/") + reqQueryVars();
+}
+function useFile(fileUrl) {
+    if (typeof ckEditorCallback != 'undefined') {
+        requestOrigin.CKEDITOR.tools.callFunction(ckEditorCallback, fileUrl);
+    } else if (typeof targetElement != 'undefined') {
+        const tElement = requestOrigin.document.getElementById(targetElement);
+        if (typeof tElement.value == 'undefined') {
+            tElement.innerHTML = fileUrl;
+        } else {
+            tElement.value = fileUrl;
+        }
+    }
+    closeFileManger();
+}
+function closeFileManger() {
+    if (window.opener) {
+        window.close();
+        return;
+    } else {
+        if (typeof callBackFn != 'undefined') {
+            requestOrigin[callBackFn]();
+        }
+    }
+}
+function setSingleDirAction() {
+    $(".singleDir").click(function (e) {
+        const tClasses = Array.from(e.target.classList);
+        const cClasses = ["singleDir", "file-item-icon", "file-item-changed", "file-item-name"];
+        const found = tClasses.some(elem => cClasses.indexOf(elem) >= 0);
+        const targetUrl = $(this).data("url") + reqQueryVars();
+        if (found) {
+            document.location = targetUrl;
+        }
+    });
+}
+function filterByType() {
+    const curPath = document.location.pathname;
+    const reqVars = reqQueryVars("A").filter(item=>!["type","q"].includes(item.split("=")[0].toLowerCase()));
+    const type=[];
+    $(".include_files").each(function(){
+        if($(this).prop("checked"))type.push($(this).val());
+    });
+    if(type.length>0)reqVars.push("type="+type.join(","));
+    const newDest=curPath+(reqVars.length>0?"?"+reqVars.join("&"):"");
+    document.location=newDest;
+}
+function searchFiles() {
+    const curPath = document.location.pathname;
+    const reqVars = reqQueryVars("A").filter(item=>!["type","q"].includes(item.split("=")[0].toLowerCase()));
+    const sp=$("#searchPattern").val();
+    if(!sp)return;
+    reqVars.push(`q=${sp}`);
+    const newDest=`${curPath}?${reqVars.join("&")}`;
+    document.location=newDest;
+}
+function setSingleFileAction() {
+    $(".singleFile").click(function (e) {
+        const tClasses = Array.from(e.target.classList);
+        const cClasses = ["singleFile", "file-item-icon", "file-item-img", "file-item-changed", "file-item-name"];
+        const found = tClasses.some(elem => cClasses.indexOf(elem) >= 0);
+        const targetUrl = $(this).data("url");
+        if (found) {
+            if (isStandAlone) {
+                window.open(targetUrl)
+            } else {
+                useFile(targetUrl);
+            }
+        }
+    });
+}
+$(function () {
+    $("#uploadBtn").click(function () {
+        $("#uFile").trigger("click");
+    });
+
+    $("#include_files_all").click(function () {
+        if (!$(this).prop("checked")) return;
+        $(".include_files").each(function () {
+            $(this).prop("checked", false);
+        });
+    });
+    $(".include_files").click(function () {
+        if (!$(this).prop("checked")) return;
+        $("#include_files_all").prop("checked", false);
+    });
+    $("#makeDirBtn").click(function () {
+        $(this).hide();
+        $('#makeDirCont').animate({
+            width: '375px'
+          });
+    });
+    $("#makeDirName").on('keypress keydown keyup',function(e){
+        if(e.which==13){
+            e.preventDefault();
+            $("#makeDirBtnOK").trigger("click");
+        }
+    });
+    $("#makeDirBtnCancel").click(function () {
+        $("#makeDirName").val("");
+        $('#makeDirCont').animate({
+            width: '0px'},
+            {
+            complete: function(){
+                $("#makeDirBtn").show();  
+            }
+          });
+    });
+    $("#makeDirBtnOK").click(function () {
+        const dirName = $("#makeDirName").val();
+        if (!dirName || dirName=="") return;
+        if (existingDirs.indexOf(dirName) >= 0) {
+            alert(`Directory "${dirName}" already exists!`);
+            return;
+        }
+        if (/[<>:"/\|?*]/.test(dirName)) {
+            alert(`Directory name "${dirName}" contains invalid characters!`);
+            return;
+        }
+        $.ajax({
+            url: document.location.pathname,
+            type: 'POST',
+            data: { dirName },
+        }).then(response => {
+            if (response.ErrorCode == 0) {
+                $("#dirsSeparator").after(response.html);
+                setSingleDirAction();
+                existingDirs.push(dirName);
+                $("#makeDirBtnCancel").trigger("click");
+            } else {
+                alert(`Something went wrong!\nError:${response.ErrorCode}\n${response.ErrorDesc}`);
+                console.log(response);
+            }
+        });
+    });
+    setSingleDirAction();
+    setSingleFileAction();
+    $(".upDir").click(upDir);
+    $("#filterFilesBtn").click(filterByType);
+    $("#searchFilesBtn").click(searchFiles);
+    $("#searchPattern").on('keypress keydown keyup',function(e){
+        if(e.which==13){
+            e.preventDefault();
+            searchFiles();
+        }
+    });
+    $("#uFile").change(function () {
+        const uFile = $(this)[0].files[0];
+        let formData = new FormData();
+        formData.append('uFile', uFile);
+        $.ajax({
+            url: document.location.pathname,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+        }).then(response => {
+            if (response.ErrorCode == 0) {
+                $("#filesSeparator").after(response.html);
+                setSingleFileAction();
+            } else {
+                alert(`Something went wrong!\nError:${response.ErrorCode}\n${response.ErrorDesc}`);
+                console.log(response);
+            }
+        });
+    });
+});

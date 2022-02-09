@@ -1,0 +1,28 @@
+{
+  "name": "fmgr-express",
+  "keywords": [
+    "filemanager",
+    "express",
+    "editor",
+    "CKEditor"
+  ],
+  "version": "0.0.1",
+  "description": "File manager for CKEditor in express.js",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "views": "views"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Faik Djikic",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "glob": "^7.2.0",
+    "http-errors": "^2.0.0",
+    "multer": "^1.4.4"
+  }
+}

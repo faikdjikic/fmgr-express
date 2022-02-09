@@ -1,0 +1,11 @@
+<div> 
+<div class="fm-title">Filters</div>
+<%allTypes.forEach(ftype=>{%>
+    <div class="filterKat"><input type="checkbox" name="type" class="include_files" value="<%-ftype%>" <%-filterbytype.includes(ftype)?"checked":""%> />
+    <%-ftype.charAt(0).toUpperCase() + ftype.slice(1)%></div>
+<%});%>
+<div class="filterKat last"><input type="checkbox" name="type" id="include_files_all" value="" <%-filterbytype.length==0?"checked":""%> />
+Any</div>
+<button type="button" id="filterFilesBtn" class="btn btn-primary mr-2"><i class="fas fa-filter"></i>&nbsp;
+Filter</button>
+</div>
