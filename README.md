@@ -39,30 +39,35 @@ app.use('/filemanager',
 ```
 ## Config object
 ```javascript
-/*
-To change these values modify file lib/config.js
+/******************************************************************************************
+* To change these values modify file lib/config.js
 */
 module.exports = {
     fmRootDir: '/public/assets', //assets directory path relative to wwwroot
     fmRootUrl: '/assets', //assets directory url
     locale: 'de-DE', //locale for file dates
-    overwrite: false, //if set to true, existing file will be overwritten, otherwise the new file will be renamed on upload
-    maxsize:'20M', 
+    overwrite: false, 
     /*
-    maximum size for single file, default 2M. 
-    Use K for kilobytes, M for megabytes and G for gigabytes. 
-    Default unit is M. 
-    To disable size limit set maxsize to 0
+    * If overwrite is set to true, existing file will be overwritten, 
+    * otherwise the new file will be renamed on upload
+    */
+    maxsize:'20M', 
+    /**************************************************************************************
+    * Sets the maximum size for single file, default 2M. 
+    * Use K for kilobytes, M for megabytes and G for gigabytes. 
+    * Default unit is M. 
+    * To disable size limit set maxsize to 0
     */
     allowExtensions: ["svg", "jpg", "jpeg", "gif", "png", "xls", "xlsx", "ppt", "pptx", 
     "pps", "ppsx", "zip", "doc", "docx", "mp3", "ogg", "oga", "mogg", "wav", "webm", "ogv", 
     "ogg", "mng", "avi", "mp4", "mpg", "mpeg", "pdf"], 
     /* The list of file extensions that are allowed for upload */
     
-    /**************************************************************************************************
-    *fileTypes array groups files by extensions, 
-    *define file icon (except for images where image itself is used as an icon). 
-    *fileTypes type properties are used for filtering by type (e.g. /filemanager/?type=word,excel,pdf).
+    /**************************************************************************************
+    * fileTypes array groups files by extensions, 
+    * define file icon (except for images where image itself is used as an icon). 
+    * fileTypes type properties are used for filtering by type 
+    * (e.g. /filemanager/?type=word,excel,pdf).
     */
     fileTypes: [
         {
