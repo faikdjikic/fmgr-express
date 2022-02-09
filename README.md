@@ -40,7 +40,7 @@ app.use('/filemanager',
 ## Config object
 ```javascript
 /*
-to change these values modify file lib/config.js
+To change these values modify file lib/config.js
 */
 module.exports = {
     fmRootDir: '/public/assets', //assets directory path relative to wwwroot
@@ -54,14 +54,15 @@ module.exports = {
     Default unit is M. 
     To disable size limit set maxsize to 0
     */
-    allowExtensions: ["svg", "jpg", "jpeg", "gif", "png", "xls", "xlsx", "ppt", "pptx", "pps", "ppsx", "zip",
-    "doc", "docx", "mp3", "ogg", "oga", "mogg", "wav", "webm", "ogv", "ogg", "mng", "avi", "mp4", "mpg", 
-    "mpeg", "pdf"], //file extensions that are allowed for upload
+    allowExtensions: ["svg", "jpg", "jpeg", "gif", "png", "xls", "xlsx", "ppt", "pptx", 
+    "pps", "ppsx", "zip", "doc", "docx", "mp3", "ogg", "oga", "mogg", "wav", "webm", "ogv", 
+    "ogg", "mng", "avi", "mp4", "mpg", "mpeg", "pdf"], 
+    /* The list of file extensions that are allowed for upload */
     
-    /*
-    fileTypes array groups files by extensions, 
-    define file icon (except for images where image itself is used as icon), 
-    and are used for filtering by type
+    /**************************************************************************************************
+    *fileTypes array groups files by extensions, 
+    *define file icon (except for images where image itself is used as an icon). 
+    *fileTypes type properties are used for filtering by type (e.g. /filemanager/?type=word,excel,pdf).
     */
     fileTypes: [
         {
@@ -71,12 +72,13 @@ module.exports = {
         },
         {
             type: "archive",
-            extensions: ["7z", "ace", "afa", "alz", "apk", "arc", "arj", "ark", "b1", "b6z", "ba", "bh", "bz2", "cab", "car",
-            "cdx", "cfs", "cpt", "dar", "dd", "dgc", "dmg", "ear", "gca", "genozip", "gz", "ha", "hki", "ice", "jar", "kgb", 
-            "lha", "lz", "lzh", "lzx", "pak", "paq6", "paq7", "paq8", "partimg", "pea", "phar", "pim", "pit", "qda", "rar", 
-            "rk", "s7z", "sda", "sea", "sen", "sfx", "shk", "sit", "sitx", "sqx", "tbz2", "tgz", "tlz", "txz", "uc", "uc0", 
-            "uc2", "uca", "ucn", "ue2", "uha", "ur2", "war", "wim", "xar", "xp3", "xz", "yz1", "Z", "zip", "zipx", "zoo", "zpaq", 
-            "zst", "zz"],
+            extensions: ["7z", "ace", "afa", "alz", "apk", "arc", "arj", "ark", "b1", "b6z", "ba", 
+            "bh", "bz2", "cab", "car", "cdx", "cfs", "cpt", "dar", "dd", "dgc", "dmg", "ear", "gca",
+            "genozip", "gz", "ha", "hki", "ice", "jar", "kgb", "lha", "lz", "lzh", "lzx", "pak", "paq6", 
+            "paq7", "paq8", "partimg", "pea", "phar", "pim", "pit", "qda", "rar", "rk", "s7z", "sda", 
+            "sea", "sen", "sfx", "shk", "sit", "sitx", "sqx", "tbz2", "tgz", "tlz", "txz", "uc", "uc0", 
+            "uc2", "uca", "ucn", "ue2", "uha", "ur2", "war", "wim", "xar", "xp3", "xz", "yz1", "Z", "zip", 
+            "zipx", "zoo", "zpaq", "zst", "zz"],
             icon: "fa-file-archive"
         },
         {
@@ -96,16 +98,18 @@ module.exports = {
         },
         {
             type: "sound",
-            extensions: ["3gp", "aa", "aac", "aax", "act", "aiff", "alac", "amr", "ape", "au", "awb", "dss", "dvf", "flac", "gsm", 
-            "iklax", "ivs", "m4a", "m4b", "m4p", "mmf", "mp3", "mpc", "msv", "nmf", "ogg", "oga", "mogg", "opus", "ra", "rm", "raw", 
-            "rf64", "sln", "tta", "voc", "vox", "wav", "wma", "wv", "8svx", "cda"],
+            extensions: ["3gp", "aa", "aac", "aax", "act", "aiff", "alac", "amr", "ape", "au", "awb", "dss", 
+            "dvf", "flac", "gsm", "iklax", "ivs", "m4a", "m4b", "m4p", "mmf", "mp3", "mpc", "msv", "nmf", 
+            "ogg", "oga", "mogg", "opus", "ra", "rm", "raw", "rf64", "sln", "tta", "voc", "vox", "wav", "wma", 
+            "wv", "8svx", "cda"],
             icon: "fa-file-audio"
         },
         {
             type: "video",
-            extensions: ["webm", "mkv", "flv", "flv", "vob", "ogv", "ogg", "drc", "gifv", "mng", "avi", "MTS", "M2TS", "TS", "mov", 
-            "qt", "wmv", "yuv", "rm", "rmvb", "viv", "asf", "amv", "mp4", "m4p", "m4v", "mpg", "mp2", "mpe", "mpv", "mpeg", "m2v", 
-            "m4v", "svi", "3gp", "3g2", "mxf", "roq", "nsv", "flv", "f4v", "f4p", "f4a", "f4b"],
+            extensions: ["webm", "mkv", "flv", "flv", "vob", "ogv", "ogg", "drc", "gifv", "mng", "avi", "MTS", 
+            "M2TS", "TS", "mov", "qt", "wmv", "yuv", "rm", "rmvb", "viv", "asf", "amv", "mp4", "m4p", "m4v", 
+            "mpg", "mp2", "mpe", "mpv", "mpeg", "m2v", "m4v", "svi", "3gp", "3g2", "mxf", "roq", "nsv", "flv", 
+            "f4v", "f4p", "f4a", "f4b"],
             icon: "fa-file-video"
         },
         {
