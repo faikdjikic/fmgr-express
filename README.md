@@ -13,6 +13,46 @@ const filemanager = require("fmgr-express");
 const app = express();
 app.use('/filemanager',filemanager);
 ```
+## Using with CKEditor
+```javascript
+//add to CKEditor's config.js following lines
+config.filebrowserBrowseUrl='/filemanager/';
+config.filebrowserImageBrowseUrl='/filemanager/?type=image';
+config.filebrowserUploadUrl='/filemanager/';
+config.filebrowserImageUploadUrl='/filemanager/?type=image';
+config.filebrowserWindowWidth='1200'; //set your own value for window width
+config.filebrowserWindowHeight='800'; //set your own value for window height
+```
+## Using with custom input and fancybox
+```html
+<input type="text" name="MainImage" id="MainImage">
+    <a
+    href="javascript:void(0)"
+    onclick="$.fancybox.open(
+    {
+        src: '/filemanager/?tElement=MainImage&onSelect=closeFancyBox',
+        type: 'iframe',
+        iframe:{
+            css:{
+                width : '75%',
+                height: '100%'
+            }
+        }
+    });">Select image</a>
+    <script>
+    function closeFancyBox(){
+	    $.fancybox.close();
+    }
+    </script>
+```
+## Using with custom input and vanilla JS
+```html
+<input type="text" name="MainImage"
+    id="MainImage">
+    <a
+    href="javascript:void(0)"
+    onclick="window.open('/filemanager/?tElement=MainImage');">Select image</a>
+```
 ## :warning: **Warning!!!**
 Filemanager does not implement access control by itself. Please use proper middleware to limit user access and avoid abuse.
 This is sample code for basic authentication using passport:
