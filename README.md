@@ -6,6 +6,10 @@ Install with npm
 
 ```
 npm i fmgr-express
+
+or
+
+npm i git@github.com:faikdjikic/fmgr-express.git
 ```
 ## Usage
 ```javascript
