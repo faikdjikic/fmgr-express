@@ -38,7 +38,9 @@ config.filebrowserWindowHeight='800'; //set your own value for window height
                 height: '100%'
             }
         }
-    });">Select image</a>
+    });">
+    Select image
+    </a>
     <script>
     function closeFancyBox(){
 	    $.fancybox.close();
@@ -47,11 +49,12 @@ config.filebrowserWindowHeight='800'; //set your own value for window height
 ```
 ## Using with custom input and vanilla JS
 ```html
-<input type="text" name="MainImage"
-    id="MainImage">
+<input type="text" name="MainImage" id="MainImage">
     <a
     href="javascript:void(0)"
-    onclick="window.open('/filemanager/?tElement=MainImage');">Select image</a>
+    onclick="window.open('/filemanager/?tElement=MainImage');">
+    Select image
+    </a>
 ```
 ## :warning: **Warning!!!**
 Filemanager does not implement access control by itself. Please use proper middleware to limit user access and avoid abuse.
