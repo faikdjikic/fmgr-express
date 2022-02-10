@@ -80,11 +80,9 @@ app.use('/filemanager',
   fileRouter
 );
 ```
-## Config object
+## Config object (*to change these values modify file lib/config.js*)
 ```javascript
-/******************************************************************************************
-* To change these values modify file lib/config.js
-*/
+
 module.exports = {
     fmRootDir: '/public/assets', //assets directory path relative to wwwroot
     fmRootUrl: '/assets', //assets directory url
