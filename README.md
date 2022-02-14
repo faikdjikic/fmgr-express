@@ -81,7 +81,7 @@ passport.use(new Strategy({ realm: loginfn.getRealm },
   }));
 app.use('/filemanager',
   passport.authenticate('basic', { session: false }),
-  fileRouter
+  filemanager
 );
 ```
 ## Config object (*to change these values modify file lib/config.js*)
