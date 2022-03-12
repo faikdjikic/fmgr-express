@@ -3,7 +3,7 @@ const existingDirs =<%-JSON.stringify(dirs.reduce((arr, itmDir) => { arr.push(it
 const requestOrigin = window.opener || window.parent;
 const ckEditorCallback = requestQuery.CKEditorFuncNum;
 const ckEditorElement = requestQuery.CKEditor;
-const callBackFn = requestQuery.onSelect;
+const callBackFn = requestQuery.cb;
 const targetElement = requestQuery.tElement;
 const isStandAlone = requestOrigin == self;
 function reqQueryVars(retType = "S") {

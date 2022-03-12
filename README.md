@@ -34,7 +34,7 @@ config.filebrowserWindowHeight='800'; //set your own value for window height
     href="javascript:void(0)"
     onclick="$.fancybox.open(
     {
-        src: '/filemanager/?tElement=MainImage&onSelect=closeFancyBox',
+        src: '/filemanager/?tElement=MainImage&cb=closeFancyBox',
         type: 'iframe',
         iframe:{
             css:{
