@@ -4,15 +4,22 @@ const config = require('./lib/config');
 const path = require("path");
 const process = require("process");
 const appDir = process.cwd();
-const rootDirArr = config.fmRootDir.split("/");
-const rootDir = path.join(appDir, ...rootDirArr);
 const multer = require("multer");
 const upload = multer({ dest: "uploads" });
 const uploadFile = require('./lib/uploadFile');
 const makeDirectory = require('./lib/makeDir');
 const listDirectory = require('./lib/listDir');
 const searchDirectory = require('./lib/searchDir');
-if (config.maxsize) {
+router.setOptions = function (options) {
+  Object.keys(options).forEach(key => config[key] = options[key]);
+  setMaxSize();
+}
+setMaxSize();
+function setMaxSize() {
+  if (!config.maxsize) {
+    config.allowSize = 2 * Math.pow(1024, 2);
+    return;
+  };
   let unitPow = 2;
   if (isNaN(config.maxsize)) {
     let maxSizeUnit = String(config.maxsize).substring(String(config.maxsize).length - 1).toUpperCase();
@@ -26,11 +33,11 @@ if (config.maxsize) {
   } else {
     config.allowSize = config.maxsize * Math.pow(1024, unitPow);
   }
-} else {
-  config.allowSize = 2 * Math.pow(1024, 2);
 }
 /* Upload file or make directory. */
 router.post('*', upload.single('uFile'), async function (req, res, next) {
+  const rootDirArr = config.fmRootDir.split("/");
+  const rootDir = path.join(appDir, ...rootDirArr);
   if (req.file) {
     const retVal = await uploadFile(req, config, rootDir);
     res.json(retVal);
@@ -45,6 +52,8 @@ router.post('*', upload.single('uFile'), async function (req, res, next) {
 });
 /* List directory or search files by pattern */
 router.get('*', async function (req, res, next) {
+  const rootDirArr = config.fmRootDir.split("/");
+  const rootDir = path.join(appDir, ...rootDirArr);
   let getDirList;
   if (req.query.q) {
     getDirList = await searchDirectory(req, next, config, rootDir);
@@ -54,7 +63,7 @@ router.get('*', async function (req, res, next) {
   if (getDirList.ErrorCode == 0) {
     res.render(path.join(__dirname, '.', 'views', 'index'), getDirList.data);
   } else {
-    getDirList.baseUrl=config.baseUrl;
+    getDirList.baseUrl = config.baseUrl;
     res.render(path.join(__dirname, '.', 'views', 'error'), getDirList);
   }
 });
