@@ -35,12 +35,16 @@ function setMaxSize() {
   }
 }
 /* Upload file or make directory. */
-router.post('*', upload.single('uFile'), async function (req, res, next) {
+router.post('*', upload.array('uFile'), async function (req, res, next) {
   const rootDirArr = config.fmRootDir.split("/");
   const rootDir = path.join(appDir, ...rootDirArr);
-  if (req.file) {
-    const retVal = await uploadFile(req, config, rootDir);
-    res.json(retVal);
+  if (req.files) {
+    const retVals = [];
+    for (i = 0; i < req.files.length; i++) {
+      const retVal = await uploadFile(req.files[i], decodeURIComponent(req.url), config, rootDir);
+      retVals.push(retVal);
+    }
+    res.json({ ErrorCode: 0, files: retVals });
   } else if (req.body.dirName) {
     const retVal = await makeDirectory(req, config, rootDir);
     res.json(retVal);

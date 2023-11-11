@@ -169,9 +169,11 @@ $(function () {
         }
     });
     $("#uFile").change(function () {
-        const uFile = $(this)[0].files[0];
-        let formData = new FormData();
-        formData.append('uFile', uFile);
+        //const uFiles = $(this)[0].files;
+        const formData = new FormData();
+        for(let i=0;i < $(this)[0].files.length;i++){
+            formData.append('uFile', $(this)[0].files[i]);
+        }
         $.ajax({
             url: document.location.pathname,
             type: 'POST',
@@ -180,7 +182,11 @@ $(function () {
             contentType: false,
         }).then(response => {
             if (response.ErrorCode == 0) {
-                $("#filesSeparator").after(response.html);
+                const filesHTML=[];
+                response.files.forEach(file=>{
+                    if(file.ErrorCode==0)filesHTML.push(file.html);
+                })
+                $("#filesSeparator").after(filesHTML.join("\n"));
                 setSingleFileAction();
             } else {
                 alert(`Something went wrong!\nError:${response.ErrorCode}\n${response.ErrorDesc}`);
