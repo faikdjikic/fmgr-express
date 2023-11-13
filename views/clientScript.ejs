@@ -183,11 +183,20 @@ $(function () {
         }).then(response => {
             if (response.ErrorCode == 0) {
                 const filesHTML=[];
+                const filesErrors=[];
                 response.files.forEach(file=>{
-                    if(file.ErrorCode==0)filesHTML.push(file.html);
+                    if(file.ErrorCode==0){
+                        filesHTML.push(file.html)
+                    }else{
+                        filesErrors.push(file.ErrorDesc);
+                    };
                 })
                 $("#filesSeparator").after(filesHTML.join("\n"));
                 setSingleFileAction();
+                if(filesErrors.length>0){
+                    const errorTitle=filesHTML.length==0?"No files uploaded:":"Some uploads returned error:";
+                    alert(`${errorTitle}\n${filesErrors.join("\n")}`);
+                }
             } else {
                 alert(`Something went wrong!\nError:${response.ErrorCode}\n${response.ErrorDesc}`);
                 console.log(response);
