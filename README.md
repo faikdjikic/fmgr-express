@@ -13,7 +13,8 @@ npm i git@github.com:faikdjikic/fmgr-express.git
 ```
 ## Usage
 ```javascript
-const options={fmRootDir: '/public/assets',
+const options={
+    fmRootDir: '/public/assets',
     fmRootUrl: '/assets',
     locale: 'en-US',
     overwrite: false, 
@@ -74,7 +75,8 @@ This is sample code for basic authentication using passport:
 
 const passport = require('passport');
 const Strategy = require('passport-http').BasicStrategy;
-const options={fmRootDir: '/public/assets',
+const options={
+    fmRootDir: '/public/assets',
     fmRootUrl: '/assets',
     locale: 'en-US',
     overwrite: false, 
