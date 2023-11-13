@@ -13,7 +13,14 @@ npm i git@github.com:faikdjikic/fmgr-express.git
 ```
 ## Usage
 ```javascript
-const filemanager = require("fmgr-express");
+const options={fmRootDir: '/public/assets',
+    fmRootUrl: '/assets',
+    locale: 'en-US',
+    overwrite: false, 
+    maxsize: '5M',
+    maxfiles: 10
+    }
+const filemanager = require("fmgr-express")(options);
 const app = express();
 app.use('/filemanager',filemanager);
 ```
@@ -67,7 +74,14 @@ This is sample code for basic authentication using passport:
 
 const passport = require('passport');
 const Strategy = require('passport-http').BasicStrategy;
-const filemanager = require("fmgr-express");
+const options={fmRootDir: '/public/assets',
+    fmRootUrl: '/assets',
+    locale: 'en-US',
+    overwrite: false, 
+    maxsize: '5M',
+    maxfiles: 10
+    }
+const filemanager = require("fmgr-express")(options);
 const app = express();
 app.use(passport.initialize());
 passport.use(new Strategy({ realm: loginfn.getRealm },
@@ -84,7 +98,7 @@ app.use('/filemanager',
   filemanager
 );
 ```
-## Config object (*to change these values modify file lib/config.js*)
+## Default values (*to change these values modify options object*)
 ```javascript
 
 module.exports = {
@@ -103,6 +117,7 @@ module.exports = {
     * Default unit is M. 
     * To disable size limit set maxsize to 0
     */
+    maxfiles: 20, //maximum number of files that can be uploaded at once
     allowExtensions: ["svg", "jpg", "jpeg", "gif", "png", "xls", "xlsx", "ppt", "pptx", 
     "pps", "ppsx", "zip", "doc", "docx", "mp3", "ogg", "oga", "mogg", "wav", "webm", "ogv", 
     "ogg", "mng", "avi", "mp4", "mpg", "mpeg", "pdf"], 
