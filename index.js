@@ -32,10 +32,19 @@ module.exports = function (options) {
   }
 
   /* Upload file or make directory. */
-  router.post('*', upload.array('uFile', config.maxfiles || 20), async function (req, res, next) {
+  router.post('*', upload.array('uFile'), async function (req, res, next) {
     const rootDirArr = config.fmRootDir.split("/");
     const rootDir = path.join(appDir, ...rootDirArr);
     if (req.files) {
+      if (req.files.length > (config.maxfiles || 20)) {
+        const message = `Too manu files.\nMaximum of ${config.maxfiles || 20} files allowed.`
+        res.json({ ErrorCode: 500, ErrorDesc: `Upload error: ${message}` });
+        const { fileDelete } = require('./lib/fsfuncs');
+        for (i = 0; i < req.files.length; i++) {
+          fileDelete(req.files[i].path);
+        }
+        return;
+      }
       const retVals = [];
       for (i = 0; i < req.files.length; i++) {
         const retVal = await uploadFile(req.files[i], decodeURIComponent(req.url), config, rootDir);
@@ -70,7 +79,7 @@ module.exports = function (options) {
   });
   router.use((err, req, res, next) => {
     if (err instanceof multer.MulterError) {
-      if(err.code=='LIMIT_UNEXPECTED_FILE')err.message=`Too manu files.\nMaximum of ${config.maxfiles || 20} files allowed.`
+      if (err.code == 'LIMIT_UNEXPECTED_FILE') err.message = `Too manu files.\nMaximum of ${config.maxfiles || 20} files allowed.`
       return res.json({ ErrorCode: 500, ErrorDesc: `Upload error: ${err.message}` });
     } else if (err) {
       // An unknown error occurred.
