@@ -37,7 +37,7 @@ module.exports = function (options) {
     const rootDir = path.join(appDir, ...rootDirArr);
     if (req.files) {
       if (req.files.length > (config.maxfiles || 20)) {
-        const message = `Too manu files.\nMaximum of ${config.maxfiles || 20} files allowed.`
+        const message = `Too many files.\nMaximum of ${config.maxfiles || 20} files allowed.`
         res.json({ ErrorCode: 500, ErrorDesc: `Upload error: ${message}` });
         const { fileDelete } = require('./lib/fsfuncs');
         for (i = 0; i < req.files.length; i++) {
@@ -71,6 +71,9 @@ module.exports = function (options) {
       getDirList = await listDirectory(req, next, config, rootDir);
     }
     if (getDirList.ErrorCode == 0) {
+      getDirList.data.maxfiles=config.maxfiles;
+      getDirList.data.maxsize=config.allowSize;
+      getDirList.data.allowextensions=config.allowExtensions;
       res.render(path.join(__dirname, '.', 'views', 'index'), getDirList.data);
     } else {
       getDirList.baseUrl = config.baseUrl;

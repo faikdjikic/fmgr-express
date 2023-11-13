@@ -6,6 +6,11 @@ const ckEditorElement = requestQuery.CKEditor;
 const callBackFn = requestQuery.cb;
 const targetElement = requestQuery.tElement;
 const isStandAlone = requestOrigin == self;
+const limits = {
+    extensions:<%-JSON.stringify(allowextensions) || "[]" %>,
+    maxsize:<%=maxsize%>,
+    maxfiles: <%=maxfiles%>
+}
 function reqQueryVars(retType = "S") {
     const rqArr = [];
     Object.keys(requestQuery).forEach(item => {
@@ -60,23 +65,23 @@ function setSingleDirAction() {
 }
 function filterByType() {
     const curPath = document.location.pathname;
-    const reqVars = reqQueryVars("A").filter(item=>!["type","q"].includes(item.split("=")[0].toLowerCase()));
-    const type=[];
-    $(".include_files").each(function(){
-        if($(this).prop("checked"))type.push($(this).val());
+    const reqVars = reqQueryVars("A").filter(item => !["type", "q"].includes(item.split("=")[0].toLowerCase()));
+    const type = [];
+    $(".include_files").each(function () {
+        if ($(this).prop("checked")) type.push($(this).val());
     });
-    if(type.length>0)reqVars.push("type="+type.join(","));
-    const newDest=curPath+(reqVars.length>0?"?"+reqVars.join("&"):"");
-    document.location=newDest;
+    if (type.length > 0) reqVars.push("type=" + type.join(","));
+    const newDest = curPath + (reqVars.length > 0 ? "?" + reqVars.join("&") : "");
+    document.location = newDest;
 }
 function searchFiles() {
     const curPath = document.location.pathname;
-    const reqVars = reqQueryVars("A").filter(item=>!["type","q"].includes(item.split("=")[0].toLowerCase()));
-    const sp=$("#searchPattern").val();
-    if(!sp)return;
+    const reqVars = reqQueryVars("A").filter(item => !["type", "q"].includes(item.split("=")[0].toLowerCase()));
+    const sp = $("#searchPattern").val();
+    if (!sp) return;
     reqVars.push(`q=${sp}`);
-    const newDest=`${curPath}?${reqVars.join("&")}`;
-    document.location=newDest;
+    const newDest = `${curPath}?${reqVars.join("&")}`;
+    document.location = newDest;
 }
 function setSingleFileAction() {
     $(".singleFile").click(function (e) {
@@ -112,10 +117,10 @@ $(function () {
         $(this).hide();
         $('#makeDirCont').animate({
             width: '375px'
-          });
+        });
     });
-    $("#makeDirName").on('keypress keydown keyup',function(e){
-        if(e.which==13){
+    $("#makeDirName").on('keypress keydown keyup', function (e) {
+        if (e.which == 13) {
             e.preventDefault();
             $("#makeDirBtnOK").trigger("click");
         }
@@ -123,16 +128,17 @@ $(function () {
     $("#makeDirBtnCancel").click(function () {
         $("#makeDirName").val("");
         $('#makeDirCont').animate({
-            width: '0px'},
+            width: '0px'
+        },
             {
-            complete: function(){
-                $("#makeDirBtn").show();  
-            }
-          });
+                complete: function () {
+                    $("#makeDirBtn").show();
+                }
+            });
     });
     $("#makeDirBtnOK").click(function () {
         const dirName = $("#makeDirName").val();
-        if (!dirName || dirName=="") return;
+        if (!dirName || dirName == "") return;
         if (existingDirs.indexOf(dirName) >= 0) {
             alert(`Directory "${dirName}" already exists!`);
             return;
@@ -162,17 +168,35 @@ $(function () {
     $(".upDir").click(upDir);
     $("#filterFilesBtn").click(filterByType);
     $("#searchFilesBtn").click(searchFiles);
-    $("#searchPattern").on('keypress keydown keyup',function(e){
-        if(e.which==13){
+    $("#searchPattern").on('keypress keydown keyup', function (e) {
+        if (e.which == 13) {
             e.preventDefault();
             searchFiles();
         }
     });
     $("#uFile").change(function () {
         //const uFiles = $(this)[0].files;
+        const invalidFiles = [];
+        if ($(this)[0].files.length > limits.maxfiles) {
+            alert(`Too many files.\nMaximum of ${limits.maxfiles || 20} files allowed.`);
+            return;
+        }
         const formData = new FormData();
-        for(let i=0;i < $(this)[0].files.length;i++){
-            formData.append('uFile', $(this)[0].files[i]);
+        let noValid=true;
+        for (let i = 0; i < $(this)[0].files.length; i++) {
+            const file = $(this)[0].files[i];
+            if (file.size>limits.maxsize){
+                invalidFiles.push({name:file.name,reason:`File too large! Maximum allowed file size is ${limits.maxsize} bytes.`});
+            }else if(!limits.extensions.map(ext=>ext.toLowerCase()).includes(file.name.split('.').reverse()[0].toLowerCase())){
+                invalidFiles.push({name:file.name,reason:`Invalid file type "${file.name.split('.').reverse()[0].toLowerCase()}"`});
+            }else{
+                noValid=false;
+                formData.append('uFile', file);
+            }
+        }
+        if(noValid){
+            alert("No valid files selected! Nothing to upload!");
+            return;
         }
         $.ajax({
             url: document.location.pathname,
@@ -182,20 +206,22 @@ $(function () {
             contentType: false,
         }).then(response => {
             if (response.ErrorCode == 0) {
-                const filesHTML=[];
-                const filesErrors=[];
-                response.files.forEach(file=>{
-                    if(file.ErrorCode==0){
+                const filesHTML = [];
+                const filesErrors = [];
+                response.files.forEach(file => {
+                    if (file.ErrorCode == 0) {
                         filesHTML.push(file.html)
-                    }else{
+                    } else {
                         filesErrors.push(file.ErrorDesc);
                     };
                 })
                 $("#filesSeparator").after(filesHTML.join("\n"));
                 setSingleFileAction();
-                if(filesErrors.length>0){
-                    const errorTitle=filesHTML.length==0?"No files uploaded:":"Some uploads returned error:";
+                if (filesErrors.length > 0) {
+                    const errorTitle = filesHTML.length == 0 ? "No files uploaded:" : "Some uploads returned error:";
                     alert(`${errorTitle}\n${filesErrors.join("\n")}`);
+                }else if(invalidFiles.length>0){
+                    alert(`These files were not uploaded:\n${invalidFiles.map(iFil=>`${iFil.name}-${iFil.reason}`).join("\n")}`);
                 }
             } else {
                 alert(`Something went wrong!\nError:${response.ErrorCode}\n${response.ErrorDesc}`);
