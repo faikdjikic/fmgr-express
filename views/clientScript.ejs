@@ -5,7 +5,7 @@ const ckEditorCallback = requestQuery.CKEditorFuncNum;
 const ckEditorElement = requestQuery.CKEditor;
 const callBackFn = requestQuery.cb;
 const targetElement = requestQuery.tElement;
-const isStandAlone = requestOrigin == self;
+const isStandAlone = window.parent == self;
 const limits = {
     extensions:<%-JSON.stringify(allowextensions) || "[]" %>,
     maxsize:<%=maxsize%>,
