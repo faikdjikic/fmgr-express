@@ -1,7 +1,7 @@
 module.exports = function (options) {
   const express = require('express');
   const router = express.Router();
-  const config = require('./lib/config');
+  const configOriginal = require('./lib/config');
   const path = require("path");
   const process = require("process");
   const appDir = process.cwd();
@@ -11,6 +11,8 @@ module.exports = function (options) {
   const makeDirectory = require('./lib/makeDir');
   const listDirectory = require('./lib/listDir');
   const searchDirectory = require('./lib/searchDir');
+  const config = {};
+  Object.assign(config, configOriginal);
   Object.keys(options).forEach(key => config[key] = options[key]);
 
   if (!config.maxsize) {
@@ -71,9 +73,9 @@ module.exports = function (options) {
       getDirList = await listDirectory(req, next, config, rootDir);
     }
     if (getDirList.ErrorCode == 0) {
-      getDirList.data.maxfiles=config.maxfiles;
-      getDirList.data.maxsize=config.allowSize;
-      getDirList.data.allowextensions=config.allowExtensions;
+      getDirList.data.maxfiles = config.maxfiles;
+      getDirList.data.maxsize = config.allowSize;
+      getDirList.data.allowextensions = config.allowExtensions;
       res.render(path.join(__dirname, '.', 'views', 'index'), getDirList.data);
     } else {
       getDirList.baseUrl = config.baseUrl;
