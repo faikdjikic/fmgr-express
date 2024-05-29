@@ -34,10 +34,13 @@ module.exports = function (options) {
   }
 
   /* Upload file or make directory. */
-  router.post('*', upload.array('uFile'), async function (req, res, next) {
+  router.post('*', upload.fields([{ name: 'uFile' }, { name: 'upload' }]), async function (req, res, next) {
     const rootDirArr = config.fmRootDir.split("/");
     const rootDir = path.join(appDir, ...rootDirArr);
+    const isCKEditUpload = req.files['upload']?.length > 0;
     if (req.files) {
+      const files = (req.files['uFile'] || []).concat(req.files['upload'] || []);
+      req.files = files;
       if (req.files.length > (config.maxfiles || 20)) {
         const message = `Too many files.\nMaximum of ${config.maxfiles || 20} files allowed.`
         res.json({ ErrorCode: 500, ErrorDesc: `Upload error: ${message}` });
@@ -52,7 +55,19 @@ module.exports = function (options) {
         const retVal = await uploadFile(req.files[i], decodeURIComponent(req.url), config, rootDir);
         retVals.push(retVal);
       }
-      res.json({ ErrorCode: 0, files: retVals });
+      if (!isCKEditUpload) {
+        res.json({ ErrorCode: 0, files: retVals });
+      } else {
+        const ckfile = retVals[0];
+        const ckReturn = { uploaded: ckfile.ErrorCode == 0 ? 1 : 0 };
+        if (!ckfile.ErrorCode) {
+          ckReturn.fileName = ckfile.name;
+          ckReturn.url = ckfile.url;
+        } else {
+          ckReturn.error = { message: ckfile.ErrorDesc }
+        }
+        res.json(ckReturn);
+      }
     } else if (req.body.dirName) {
       const retVal = await makeDirectory(req, config, rootDir);
       res.json(retVal);
