@@ -52,7 +52,8 @@ module.exports = function (options) {
       }
       const retVals = [];
       for (i = 0; i < req.files.length; i++) {
-        const retVal = await uploadFile(req.files[i], decodeURIComponent(req.url), config, rootDir);
+        const reqPath = decodeURIComponent(req.url.replace("&responseType=json", ""));
+        const retVal = await uploadFile(req.files[i], reqPath, config, rootDir);
         retVals.push(retVal);
       }
       if (!isCKEditUpload) {
