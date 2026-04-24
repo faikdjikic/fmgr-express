@@ -37,7 +37,7 @@ module.exports = function (options) {
   router.post('*', upload.fields([{ name: 'uFile' }, { name: 'upload' }]), async function (req, res, next) {
     const rootDirArr = config.fmRootDir.split("/");
     const rootDir = path.join(appDir, ...rootDirArr);
-    const isCKEditUpload = req.files['upload']?.length > 0;
+    const isCKEditUpload = req.files ? req.files['upload']?.length > 0 : false;
     if (req.files) {
       const files = (req.files['uFile'] || []).concat(req.files['upload'] || []);
       req.files = files;
